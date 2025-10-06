@@ -4,16 +4,17 @@
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
 3. [Project Setup](#project-setup)
-4. [Understanding the Project Structure](#understanding-the-project-structure)
-5. [Creating the Command Infrastructure](#creating-the-command-infrastructure)
-6. [Building the Wizard UI](#building-the-wizard-ui)
-7. [Implementing the ViewModel](#implementing-the-viewmodel)
-8. [Creating the Command Handler](#creating-the-command-handler)
-9. [Configuring the Package](#configuring-the-package)
-10. [Project Configuration Explained](#project-configuration-explained)
-11. [Building and Testing](#building-and-testing)
-12. [Troubleshooting](#troubleshooting)
-13. [Next Steps](#next-steps)
+4. [Evolution of the Project Configuration](#evolution-of-the-project-configuration)
+5. [Understanding the Project Structure](#understanding-the-project-structure)
+6. [Creating the Command Infrastructure](#creating-the-command-infrastructure)
+7. [Building the Wizard UI](#building-the-wizard-ui)
+8. [Implementing the ViewModel](#implementing-the-viewmodel)
+9. [Creating the Command Handler](#creating-the-command-handler)
+10. [Configuring the Package](#configuring-the-package)
+11. [Project Configuration Explained](#project-configuration-explained)
+12. [Building and Testing](#building-and-testing)
+13. [Troubleshooting](#troubleshooting)
+14. [Next Steps](#next-steps)
 
 ---
 
@@ -199,6 +200,152 @@ Create `MyVSExtension.csproj` with the following content:
 ```powershell
 [guid]::NewGuid().ToString().ToUpper()
 ```
+
+---
+
+## Evolution of the Project Configuration
+
+### What Changed During Development
+
+This section documents the key differences between the **original project setup** and the **final working version**. Understanding these changes will help you avoid common pitfalls.
+
+#### Original Project Configuration
+
+When the project was first created using Visual Studio's VSIX Project template, it had:
+
+**Original .csproj (SDK-style format):**
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Library</OutputType>
+    <!-- SDK-style project structure -->
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Community.VisualStudio.Toolkit" Version="17.0.x" />
+  </ItemGroup>
+</Project>
+```
+
+**Key characteristics of original:**
+- ✗ SDK-style project format (`<Project Sdk="..."`)
+- ✗ ToolsVersion not specified (or was different)
+- ✗ No explicit `ProjectTypeGuids`
+- ✗ Missing `Microsoft.VsSDK.targets` import
+- ✗ Using `Community.VisualStudio.Toolkit` package
+- ✗ No debugging configuration (StartAction/StartProgram)
+- ✗ RuntimeIdentifier errors when building
+
+#### Final Working Configuration
+
+**Final .csproj (Old-style format):**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
+    <VSToolsPath>...</VSToolsPath>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
+    <StartArguments>/rootsuffix Exp</StartArguments>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <NuGetPackageImportStamp></NuGetPackageImportStamp>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.12.40391" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" />
+    <!-- Direct Microsoft packages instead of toolkit -->
+  </ItemGroup>
+  
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+</Project>
+```
+
+**Key characteristics of final version:**
+- ✓ Old-style project format (no `Sdk` attribute)
+- ✓ `ToolsVersion="15.0"` explicitly set
+- ✓ VSIX ProjectTypeGuid: `{82b43b9b-a64c-4715-b499-d71e9ca2bd60}`
+- ✓ **Critical:** `Microsoft.VsSDK.targets` import at bottom
+- ✓ Direct Microsoft.VisualStudio.* packages
+- ✓ Full F5 debugging configuration
+- ✓ No RuntimeIdentifier issues
+
+### Specific Changes Made
+
+#### 1. **ToolsVersion Changed**
+```diff
+- <Project Sdk="Microsoft.NET.Sdk">
++ <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="...">
+```
+**Why:** VSSDK build tools require old-style MSBuild format. ToolsVersion 15.0 is the standard for VS extension projects.
+
+#### 2. **Project Structure Conversion**
+```diff
+- SDK-style format (implicit files, simplified syntax)
++ Old-style format (explicit file references, full PropertyGroups)
+```
+**Why:** The VSSDK targets and tools are designed for old-style projects. SDK-style causes RuntimeIdentifier and other errors.
+
+#### 3. **NuGet Package Strategy**
+```diff
+- <PackageReference Include="Community.VisualStudio.Toolkit" Version="17.0.x" />
++ <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.12.40391" />
++ <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="17.12.40391" />
++ <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120" />
+```
+**Why:** Community.VisualStudio.Toolkit is excellent for SDK-style projects but adds complexity for old-style projects. Direct Microsoft packages give better control.
+
+#### 4. **Added VSIX Generation**
+```diff
++ <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+```
+**Why:** This is THE critical line that makes the project generate a .vsix file. Without it, you only get a DLL.
+
+#### 5. **Added Debugging Support**
+```diff
++ <StartAction>Program</StartAction>
++ <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
++ <StartArguments>/rootsuffix Exp</StartArguments>
+```
+**Why:** Allows F5 debugging by launching VS experimental instance. Original project couldn't run directly.
+
+#### 6. **Added VSIX-Specific Properties**
+```diff
++ <GeneratePkgDefFile>true</GeneratePkgDefFile>
++ <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
++ <NuGetPackageImportStamp></NuGetPackageImportStamp>
+```
+**Why:** These tell the build system to generate VSIX metadata and handle NuGet package imports properly.
+
+### Timeline of Changes
+
+1. **Initial State:** SDK-style project, Community.VisualStudio.Toolkit
+2. **Error 1:** "Cannot run because it's a class library" → Added StartAction
+3. **Error 2:** RuntimeIdentifier errors → Converted to old-style .csproj
+4. **Error 3:** Only DLL produced → Added Microsoft.VsSDK.targets import
+5. **Error 4:** AsyncPackage not found → Switched to direct Microsoft packages
+6. **Final State:** Fully working old-style project with proper VSIX generation
+
+### Key Lessons
+
+**🔑 Most Important:**
+- **VSSDK requires old-style .csproj format** - This is non-negotiable
+- **`Microsoft.VsSDK.targets` import is critical** - No VSIX without it
+- **ToolsVersion="15.0" is the standard** - Don't use higher or SDK-style
+
+**💡 Recommendations:**
+- Start with old-style format for VSIX projects
+- Use direct Microsoft.VisualStudio.* packages for maximum compatibility
+- Always include StartAction/StartProgram for F5 debugging
+- Reference working extensions (like FontSizer) when in doubt
 
 ---
 
