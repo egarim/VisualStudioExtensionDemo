@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+  <Include href="KnownImageIds.vsct"/>
+
+  <Commands package="guidIncreaseFontSizePackage">
+    <Groups>
+      <Group guid="guidIncreaseFontSizePackage" id="EditorGroup" priority="0x0600">
+        <Parent guid="guidIncreaseFontSizePackage" id="MyMenu" />
+      </Group>
+      <Group guid="guidIncreaseFontSizePackage" id="EnvironmentGroup" priority="0x0600">
+        <Parent guid="guidIncreaseFontSizePackage" id="MyMenu" />
+      </Group>
+    </Groups>
+
+    <Menus>
+      <Menu guid="guidIncreaseFontSizePackage" id="MyMenu" priority="100" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_EXT_TOOLS"/>
+        <Strings>
+          <ButtonText>Font Sizer</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
+    <Buttons>
+      <Button guid="guidIncreaseFontSizePackage" id="cmdidIncreaseFontSize" priority="0x0100" type="Button">
+        <Parent guid="guidIncreaseFontSizePackage" id="EditorGroup" />
+        <Icon guid="ImageCatalogGuid" id="IncreaseFontSize" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Increase Editor Font Sizes</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidIncreaseFontSizePackage" id="cmdidDecreaseFontSize" priority="0x0100" type="Button">
+        <Parent guid="guidIncreaseFontSizePackage" id="EditorGroup" />
+        <Icon guid="ImageCatalogGuid" id="DecreaseFontSize" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Decrease Editor Font Sizes</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidIncreaseFontSizePackage" id="cmdidIncreaseEnviornmentFontSize" priority="0x0100" type="Button">
+        <Parent guid="guidIncreaseFontSizePackage" id="EnvironmentGroup" />
+        <Icon guid="ImageCatalogGuid" id="IncreaseFontSize" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Increase Enviornment Font Size</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidIncreaseFontSizePackage" id="cmdidDecreaseEnviornmentFontSize" priority="0x0100" type="Button">
+        <Parent guid="guidIncreaseFontSizePackage" id="EnvironmentGroup" />
+        <Icon guid="ImageCatalogGuid" id="DecreaseFontSize" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Decrease Enviornment Font Size</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="guidIncreaseFontSizePackage" id="cmdidIncreaseFontSize" editor="guidVSStd97" key1="VK_ADD" mod1="Control" />
+    <KeyBinding guid="guidIncreaseFontSizePackage" id="cmdidDecreaseFontSize" editor="guidVSStd97" key1="VK_SUBTRACT" mod1="Control" />
+    <KeyBinding guid="guidIncreaseFontSizePackage" id="cmdidIncreaseEnviornmentFontSize" editor="guidVSStd97" key1="VK_ADD" mod1="Control Shift" />
+    <KeyBinding guid="guidIncreaseFontSizePackage" id="cmdidDecreaseEnviornmentFontSize" editor="guidVSStd97" key1="VK_SUBTRACT" mod1="Control Shift" />
+  </KeyBindings>
+
+  <Symbols>
+    <GuidSymbol name="guidIncreaseFontSizePackage" value="{1099b5c0-7023-4762-9cd9-008d1219c716}">
+      <IDSymbol name="EditorGroup" value="0x1020" />
+      <IDSymbol name="EnvironmentGroup" value="0x1021" />
+      <IDSymbol name="MyMenu" value="0x1030" />
+      <IDSymbol name="cmdidIncreaseFontSize" value="0x0100" />
+      <IDSymbol name="cmdidDecreaseFontSize" value="0x0200" />
+      <IDSymbol name="cmdidIncreaseEnviornmentFontSize" value="0x0300" />
+      <IDSymbol name="cmdidDecreaseEnviornmentFontSize" value="0x0400" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

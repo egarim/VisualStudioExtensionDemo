@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h"/>
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidVisualStudioExtensionDemoPackage">
+    <Groups>
+      <!-- Group for Tools menu -->
+      <Group guid="guidVisualStudioExtensionDemoPackageCmdSet" id="MyToolsMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+      
+      <!-- Group for Solution context menu -->
+      <Group guid="guidVisualStudioExtensionDemoPackageCmdSet" id="MySolutionContextMenuGroup" priority="0x0100">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_SOLNNODE"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <!-- Launch Wizard Command -->
+      <Button guid="guidVisualStudioExtensionDemoPackageCmdSet" id="LaunchWizardCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidVisualStudioExtensionDemoPackageCmdSet" id="MyToolsMenuGroup" />
+        <Icon guid="guidImages" id="bmpWizard" />
+        <Strings>
+          <ButtonText>Launch Wizard...</ButtonText>
+        </Strings>
+      </Button>
+      
+      <!-- Same command on Solution context menu -->
+      <Button guid="guidVisualStudioExtensionDemoPackageCmdSet" id="LaunchWizardCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidVisualStudioExtensionDemoPackageCmdSet" id="MySolutionContextMenuGroup" />
+        <Icon guid="guidImages" id="bmpWizard" />
+        <Strings>
+          <ButtonText>Launch Wizard...</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\LaunchWizardCommand.png" usedList="bmpWizard"/>
+    </Bitmaps>
+  </Commands>
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidVisualStudioExtensionDemoPackage" value="{3585fa04-f266-4f27-8bfa-ec0da391a659}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidVisualStudioExtensionDemoPackageCmdSet" value="{a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d}">
+      <IDSymbol name="MyToolsMenuGroup" value="0x1020" />
+      <IDSymbol name="MySolutionContextMenuGroup" value="0x1021" />
+      <IDSymbol name="LaunchWizardCommandId" value="0x0100" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5e}">
+      <IDSymbol name="bmpWizard" value="1" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
